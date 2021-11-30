@@ -1,0 +1,85 @@
+package mc.apptoeat.com.utils.shortcuts;
+
+import net.minecraft.server.v1_8_R3.EnumParticle;
+import net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class WorldUtils {
+    public static void spawnParticle(EnumParticle particle, int speed, float amount, Location location, Player player) {
+        PacketPlayOutWorldParticles particles = new PacketPlayOutWorldParticles(particle,false, (float) location.getX(), (float) location.getY(),(float) location.getZ(),0,0,0,amount,speed);
+        for (Player players : player.getWorld().getPlayers()) {
+            if (players.getLocation().distance(location) < 25) {
+                ((CraftPlayer) players).getHandle().playerConnection.sendPacket(particles);
+            }
+        }
+    }
+
+    public static void spawnParticleWithRandom(EnumParticle particle, int speed, float amount, Location location, Player player,double red,double green,double blue) {
+        PacketPlayOutWorldParticles particles = new PacketPlayOutWorldParticles(particle,true, (float) location.getX(), (float) location.getY(),(float) location.getZ(),(float) red,(float) green,(float) blue,0,(int) amount,0);
+        for (Player players : player.getWorld().getPlayers()) {
+            if (players.getLocation().distance(location) < 25) {
+                ((CraftPlayer) players).getHandle().playerConnection.sendPacket(particles);
+            }
+        };
+
+    }
+
+    public static void spawnParticleWithOffSet(EnumParticle particle, int speed, float amount, Location location, Player player,Double offset) {
+        for (int t = 0;t < amount;t++) {
+            Location loc = location.toVector().add(new Vector(getRandom(-offset,offset),getRandom(-offset,offset),getRandom(-offset,offset))).toLocation(location.getWorld());
+            PacketPlayOutWorldParticles particles = new PacketPlayOutWorldParticles(particle,false, (float) loc.getX(), (float) loc.getY(),(float) loc.getZ(),0,0,0,1,speed);
+            for (Player players : player.getWorld().getPlayers()) {
+                if (players.getLocation().distance(location) < 25) {
+                    ((CraftPlayer) players).getHandle().playerConnection.sendPacket(particles);
+                }
+            }
+        }
+    }
+
+
+    public static double getRandom(double min,double max) {
+        min = min * 100;
+        max = max * 100;
+
+        for(int i = (int) min; i <=max; i++) {
+            double getRandomValue = ((int) (Math.random() * (max - min)) + min) / 100;
+            return getRandomValue;
+        }
+        return 0;
+    }
+
+    public static List<Block> blocksFromTwoPoints(Location loc1, Location loc2) {
+        List<Block> blocks = new ArrayList<Block>();
+
+        int topBlockX = (loc1.getBlockX() < loc2.getBlockX() ? loc2.getBlockX() : loc1.getBlockX());
+        int bottomBlockX = (loc1.getBlockX() > loc2.getBlockX() ? loc2.getBlockX() : loc1.getBlockX());
+
+        int topBlockY = (loc1.getBlockY() < loc2.getBlockY() ? loc2.getBlockY() : loc1.getBlockY());
+        int bottomBlockY = (loc1.getBlockY() > loc2.getBlockY() ? loc2.getBlockY() : loc1.getBlockY());
+
+        int topBlockZ = (loc1.getBlockZ() < loc2.getBlockZ() ? loc2.getBlockZ() : loc1.getBlockZ());
+        int bottomBlockZ = (loc1.getBlockZ() > loc2.getBlockZ() ? loc2.getBlockZ() : loc1.getBlockZ());
+
+        for(int x = bottomBlockX; x <= topBlockX; x++)
+        {
+            for(int z = bottomBlockZ; z <= topBlockZ; z++)
+            {
+                for(int y = bottomBlockY; y <= topBlockY; y++)
+                {
+                    Block block = loc1.getWorld().getBlockAt(x, y, z);
+
+                    blocks.add(block);
+                }
+            }
+        }
+
+        return blocks;
+    }
+}
