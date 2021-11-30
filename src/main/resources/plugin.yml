@@ -1,6 +1,0 @@
-name: AppToEatCore
-version: '${project.version}'
-main: mc.apptoeat.com.main
-api-version: 1.8
-authors: [ Crafticat, vWinter ]
-description: Utils + Core for apptoeat.
