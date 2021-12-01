@@ -23,6 +23,15 @@ public class DataLocation {
         this.z = z;
     }
 
+    public DataLocation(Location location) {
+        this.x = location.getX();
+        this.y = location.getY();
+        this.z = location.getZ();
+        this.yaw = location.getYaw();
+        this.pitch = location.getPitch();
+        this.world = location.getWorld();
+    }
+
     public DataLocation clone() {
         return new DataLocation(x,y,z,yaw,pitch,world,onGround);
     }

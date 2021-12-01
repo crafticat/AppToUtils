@@ -30,8 +30,9 @@ public class NPC extends Event {
     private World world;
     private DataLocation oldLoc;
     private int ticks;
+    private Player target;
 
-    public NPC(Location loc, String name, World w) {
+    public NPC(Location loc, String name, World w,Player target) {
         if (name.length() < 16) {
             MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
             WorldServer world = ((CraftWorld) w).getHandle();
@@ -43,6 +44,7 @@ public class NPC extends Event {
             location = new DataLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
             oldLoc = location;
             this.world = w;
+            this.target = target;
             sendCreatesPackets();
 
             core.getInstance().getEventManager().getEvents().add(this);
@@ -56,7 +58,7 @@ public class NPC extends Event {
 
     public void updatePos() {
         Vector lastMot = lastMotion.clone();
-        Vector motion = PathFinder.newMotion(location.clone(),lastMot,0.1,world);
+        Vector motion = PathFinder.newMotion(location.clone(),lastMot,0.1,world,npc.getId());
         lastMotion = motion;
         location.addVector(motion);
     }
@@ -65,6 +67,7 @@ public class NPC extends Event {
         core.getInstance().getSyncTaskScheduler().addRepeatingTask(new Runnable() {
             @Override
             public void run() {
+                setPath(target.getLocation());
                 if (to != null) {
 
                     Location from = new Location(world,location.getX(),location.getY(),location.getZ());
@@ -75,12 +78,9 @@ public class NPC extends Event {
                     ticks++;
                     if (ticks >= 3) {
                         for (Player player : Bukkit.getOnlinePlayers()) {
-                            Nms.sendPacket(player, new PacketPlayOutEntity.PacketPlayOutRelEntityMove(npc.getId()
-                                    , (byte) ((location.getX() - oldLoc.getX()) * 32)
-                                    , (byte) ((location.getY() - oldLoc.getY()) * 32)
-                                    , (byte) ((location.getZ() - oldLoc.getZ()) * 32),false));
-
                             oldLoc = location;
+                            Nms.sendPacket(player,new PacketPlayOutEntityTeleport(npc));
+                            npc.setLocation(location.getX(),location.getY(),location.getZ(),location.getYaw(),location.getPitch());
                             WorldUtils.spawnParticle(EnumParticle.FLAME, 0, 1, location.toLocation(world), player);
                         }
                         ticks = 0;

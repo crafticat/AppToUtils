@@ -23,7 +23,7 @@ public class Test extends ItemAbility {
             @Override
             public void run() {
                 player.sendMessage("click1");
-                 data.npc = new NPC(player.getLocation(), player.getName(), player.getWorld());
+                 data.npc = new NPC(player.getLocation(), player.getName(), player.getWorld(),player);
             }
         });
         gui.createGuiItem(Material.IRON_SWORD, 2, "2", new Runnable() {
