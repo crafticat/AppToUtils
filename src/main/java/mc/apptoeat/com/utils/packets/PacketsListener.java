@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -29,6 +30,17 @@ public class PacketsListener implements Listener {
         addPlayer(e.getPlayer());
         core.getInstance().getDataManager().add(e.getPlayer());
         JoinQuitPacket.join(e.getPlayer());
+    }
+
+    @EventHandler
+    public void invClickEvent(InventoryClickEvent e) {
+        try {
+            core.getInstance().getEventManager().getEvents().forEach(event -> {
+                event.invClickEvent((Player) e.getWhoClicked(),e);
+            });
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 
     @EventHandler

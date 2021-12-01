@@ -7,11 +7,11 @@ import org.bukkit.entity.Player;
 
 public class Nms {
 
-    public EntityPlayer getPlayer(Player player) {
+    public static EntityPlayer getPlayer(Player player) {
         return  ((CraftPlayer) player).getHandle();
     }
 
-    public void sendPacket(Player player, Packet packet) {
+    public static void sendPacket(Player player, Packet packet) {
         getPlayer(player).playerConnection.sendPacket(packet);
     }
 }

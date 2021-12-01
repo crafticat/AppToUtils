@@ -1,8 +1,11 @@
 package mc.apptoeat.com.utils.shortcuts;
 
+import mc.apptoeat.com.utils.data.DataLocation;
 import net.minecraft.server.v1_8_R3.EnumParticle;
 import net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -41,6 +44,42 @@ public class WorldUtils {
                 }
             }
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    public static double getFrictionFromLoc(Location loc) {
+        float friction = 0.91f;
+        String getBlock = "stone";
+        Location location = new Location(loc.getWorld(),loc.getX(),loc.getY() - 1,loc.getZ());
+
+        if (location.getBlock().getType() == Material.AIR) getBlock = "air";
+        if (location.getBlock().getType() == Material.SLIME_BLOCK) getBlock = "slime";
+        if (location.getBlock().getType() == Material.ICE) getBlock = "ice";
+        if (location.getBlock().getType() == Material.PACKED_ICE) getBlock = "ice";
+
+        if (getBlock.equals("stone")) friction*=0.6;
+        if (getBlock.equals("ice")) friction*=0.98;
+        if (getBlock.equals("slime")) friction*=0.8;
+
+        return friction;
+    }
+
+    @SuppressWarnings("deprecation")
+    public static double getFrictionFromDataLoc(DataLocation loc, World world) {
+        float friction = 0.91f;
+        String getBlock = "stone";
+        Location location = new Location(world,loc.getX(),loc.getY() - 1,loc.getZ());
+
+        if (location.getBlock().getType() == Material.AIR) getBlock = "air";
+        if (location.getBlock().getType() == Material.SLIME_BLOCK) getBlock = "slime";
+        if (location.getBlock().getType() == Material.ICE) getBlock = "ice";
+        if (location.getBlock().getType() == Material.PACKED_ICE) getBlock = "ice";
+
+        if (getBlock.equals("stone")) friction*=0.6;
+        if (getBlock.equals("ice")) friction*=0.98;
+        if (getBlock.equals("slime")) friction*=0.8;
+
+        return friction;
     }
 
 

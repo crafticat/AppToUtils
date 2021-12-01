@@ -3,6 +3,7 @@ package mc.apptoeat.com;
 import lombok.Getter;
 import mc.apptoeat.com.utils.managers.DataManager;
 import mc.apptoeat.com.utils.managers.EventManager;
+import mc.apptoeat.com.utils.managers.GuiManager;
 import mc.apptoeat.com.utils.managers.ItemAbilityManager;
 import mc.apptoeat.com.utils.packets.PacketsListener;
 import mc.apptoeat.com.utils.shortcuts.SyncTaskScheduler;
@@ -16,6 +17,7 @@ public final class core extends JavaPlugin {
     private static core instance;
     private EventManager eventManager;
     private DataManager dataManager;
+    private GuiManager guiManager;
     private ItemAbilityManager itemAbilityManager;
     private SyncTaskScheduler syncTaskScheduler;
 
@@ -36,6 +38,7 @@ public final class core extends JavaPlugin {
         eventManager = new EventManager();
         dataManager = new DataManager();
         itemAbilityManager = new ItemAbilityManager();
+        guiManager = new GuiManager();
 
         syncTaskScheduler = new SyncTaskScheduler(this);
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, syncTaskScheduler, 0L, 1L);
