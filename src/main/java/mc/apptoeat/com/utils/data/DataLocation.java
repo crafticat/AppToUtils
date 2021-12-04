@@ -32,6 +32,11 @@ public class DataLocation {
         this.world = location.getWorld();
     }
 
+
+    public Vector toVector() {
+        return new Vector(x,y,z);
+    }
+
     public DataLocation clone() {
         return new DataLocation(x,y,z,yaw,pitch,world,onGround);
     }

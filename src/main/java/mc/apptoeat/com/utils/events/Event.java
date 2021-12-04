@@ -16,7 +16,7 @@ public class Event {
     /* Events */
     public void moveEvent(Player player, DataLocation to, DataLocation from, PacketPlayInFlying wrapper) {}
 
-    public void attackEvent(Player player) {}
+    public void attackEvent(Player player,int id) {}
 
     public void rightClickEvent(Player player, ItemStack clickedItem) {}
 
@@ -25,4 +25,6 @@ public class Event {
     public void joinEvent(Player player) {}
 
     public void quitEvent(Player player) {}
+
+    public void swing(Player player) {}
 }

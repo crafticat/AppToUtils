@@ -3,6 +3,7 @@ package mc.apptoeat.com.utils.shortcuts;
 import mc.apptoeat.com.utils.data.DataLocation;
 import net.minecraft.server.v1_8_R3.EnumParticle;
 import net.minecraft.server.v1_8_R3.PacketPlayOutWorldParticles;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -32,6 +33,32 @@ public class WorldUtils {
             }
         };
 
+    }
+
+    public static boolean onGround(Location location) {
+        Block block = new Location(location.getWorld(),location.getX(),location.getY() - 0.001,location.getZ()).getBlock();
+        Bukkit.broadcastMessage("true");
+        return true;
+    }
+
+    public static boolean nearBlock(Location location,Material material,double xzOffset,double yOffSet) {
+        Location min = location.toVector().add(new Vector(xzOffset,1,xzOffset)).toLocation(location.getWorld());
+        Location max = location.toVector().subtract(new Vector(xzOffset,yOffSet,xzOffset)).toLocation(location.getWorld());
+
+        for (Block block : blocksFromTwoPoints(min,max)) {
+            if (block.getType() == material) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static float calculateYawDifference(Location from, Location to) {
+        Location clonedFrom = from.clone();
+        Vector startVector = clonedFrom.toVector();
+        Vector targetVector = to.toVector();
+        clonedFrom.setDirection(targetVector.subtract(startVector));
+        return clonedFrom.getYaw();
     }
 
     public static void spawnParticleWithOffSet(EnumParticle particle, int speed, float amount, Location location, Player player,Double offset) {
@@ -68,7 +95,7 @@ public class WorldUtils {
     public static double getFrictionFromDataLoc(DataLocation loc, World world) {
         float friction = 0.91f;
         String getBlock = "stone";
-        Location location = new Location(world,loc.getX(),loc.getY() - 1,loc.getZ());
+        Location location = new Location(world,loc.getX(),loc.getY() - 0.01,loc.getZ());
 
         if (location.getBlock().getType() == Material.AIR) getBlock = "air";
         if (location.getBlock().getType() == Material.SLIME_BLOCK) getBlock = "slime";

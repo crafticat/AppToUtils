@@ -2,10 +2,10 @@ package mc.apptoeat.com.utils.packets;
 
 import io.netty.channel.*;
 import mc.apptoeat.com.core;
-import mc.apptoeat.com.utils.packets.handle.FlyingPacket;
-import mc.apptoeat.com.utils.packets.handle.JoinQuitPacket;
-import mc.apptoeat.com.utils.packets.handle.RightClickPacket;
+import mc.apptoeat.com.utils.packets.handle.*;
+import net.minecraft.server.v1_8_R3.PacketPlayInArmAnimation;
 import net.minecraft.server.v1_8_R3.PacketPlayInFlying;
+import net.minecraft.server.v1_8_R3.PacketPlayInUseEntity;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -55,9 +55,9 @@ public class PacketsListener implements Listener {
             @Override
             @Deprecated
             public void channelRead(ChannelHandlerContext channelHandlerContext, Object packet) throws Exception {
-                if (packet instanceof PacketPlayInFlying) {
-                    FlyingPacket.handle(player,(PacketPlayInFlying) packet);
-                }
+                if (packet instanceof PacketPlayInFlying) FlyingPacket.handle(player,(PacketPlayInFlying) packet);
+                if (packet instanceof PacketPlayInUseEntity) AttackPacket.handle(player,(PacketPlayInUseEntity) packet);
+                if (packet instanceof PacketPlayInArmAnimation) SwingPacket.handle(player,(PacketPlayInArmAnimation) packet);
 
                 super.channelRead(channelHandlerContext,packet);
             }
