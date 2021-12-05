@@ -35,6 +35,7 @@ public class NPCDamage extends Event {
         //todo recode NPC class
         for (NPC npc : core.getInstance().getNpcManager().getNpcs()) {
             if (npc.getNpc().getId() == id) {
+                Nms.sendPacket(player,new PacketPlayOutAnimation(npc.getNpc(),5));
                 if (System.currentTimeMillis() - lastDamage.getOrDefault(id,0L) > 475) {
                     sendDamage(npc,player);
                     lastDamage.put(id,System.currentTimeMillis());
@@ -44,7 +45,7 @@ public class NPCDamage extends Event {
     }
 
     public void sendDamage(NPC npc,Player attacker) {
-        npc.setVelocity(getVelocityAtDirection(attacker.getLocation().getYaw(), attacker.getWorld(),attacker,npc.getLastYUpdate(),npc.isReduce(),npc.getHVelocity(),npc.getVVelocity()));
+        npc.setVelocity(getVelocityAtDirection(attacker.getLocation().getYaw(), attacker.getWorld(),attacker,npc.getLastYUpdate(),npc.isReduce(),npc.getHVelocity(),npc.getVVelocity(),true));
         npc.setVelocityTaken(true);
         Nms.sendPacket(attacker,new PacketPlayOutAnimation(npc.getNpc(),1));
         attacker.playSound(attacker.getLocation(), Sound.HURT_FLESH, 100, 1);
@@ -54,7 +55,14 @@ public class NPCDamage extends Event {
         }
     }
 
-    public Vector getVelocityAtDirection(float yaw, World world,Player attacker,long yUpdate,boolean reduce,double h,double v) {
+    public static void sendDamage(NPC npc,Player attacker,float yaw) {
+        npc.setVelocity(getVelocityAtDirection(yaw, attacker.getWorld(),attacker,npc.getLastYUpdate(),npc.isReduce(),npc.getHVelocity(),npc.getVVelocity(),false));
+        npc.setVelocityTaken(true);
+        Nms.sendPacket(attacker,new PacketPlayOutAnimation(npc.getNpc(),1));
+        attacker.playSound(attacker.getLocation(), Sound.HURT_FLESH, 100, 1);
+    }
+
+    public static Vector getVelocityAtDirection(float yaw, World world, Player attacker, long yUpdate, boolean reduce, double h, double v,boolean checkForSprinting) {
 
         double hVelocity;
         if (h == 0) {
@@ -65,7 +73,7 @@ public class NPCDamage extends Event {
             hVelocity *= 1.1;
         }
 
-        if (attacker.isSprinting()) {
+        if (attacker.isSprinting() && checkForSprinting) {
             hVelocity*=1.2;
         }
         if (reduce) {

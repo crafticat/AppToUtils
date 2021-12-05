@@ -43,4 +43,14 @@ public class FileManager {
             return main.getConfig().getDouble(path);
         }
     }
+
+    public static boolean getOrDefault(JavaPlugin main,String path,boolean def) {
+        if (!main.getConfig().isSet(path)) {
+            main.getConfig().set(path,def);
+            main.saveConfig();
+            return def;
+        } else {
+            return main.getConfig().getBoolean(path);
+        }
+    }
 }

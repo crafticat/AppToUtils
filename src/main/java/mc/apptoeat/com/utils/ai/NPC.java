@@ -4,9 +4,9 @@ import com.mojang.authlib.GameProfile;
 import lombok.Getter;
 import lombok.Setter;
 import mc.apptoeat.com.core;
+import mc.apptoeat.com.utils.ai.PathFinding.HandleEntity;
 import mc.apptoeat.com.utils.ai.PathFinding.NPCInventory;
 import mc.apptoeat.com.utils.ai.PathFinding.PathFinder;
-import mc.apptoeat.com.utils.ai.PathFinding.VelocityManager;
 import mc.apptoeat.com.utils.data.DataLocation;
 import mc.apptoeat.com.utils.events.Event;
 import mc.apptoeat.com.utils.shortcuts.*;
@@ -19,13 +19,10 @@ import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -64,10 +61,12 @@ public class NPC extends Event {
     /* What's specials about it: it fully abides the Minecraft calculations which a lot of npc plugins don't such as citizens. */
 
     public NPC(Location loc, String name, World w,Player target,int attackTicks,double reach,boolean targeting,boolean strafing,NPCInventory inventory,double h,double v) {
-        if (name.length() < 16) {
             MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
             WorldServer world = ((CraftWorld) w).getHandle();
-            GameProfile profile = new GameProfile(target.getUniqueId(), Color.code(name));
+            UUID uuid = target.getUniqueId();
+            GameProfile profile = new GameProfile(uuid, Color.code("&b&lCatBoty"));
+
+
 
             npc = new EntityPlayer(server, world, profile, new PlayerInteractManager(world));
             npc.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
@@ -96,8 +95,8 @@ public class NPC extends Event {
             velocityTaken = false;
             this.attackTicks = attackTicks;
             this.reach = reach;
-        } else Bukkit.broadcastMessage(Color.code("&cError&f: npc max letters is 16 letters -> &7" + name.length()));
     }
+
 
     public void setItemsFromInv(NPCInventory inventory) {
         if (inventory.getMainItem() != null) {
@@ -192,7 +191,7 @@ public class NPC extends Event {
             }
         }
 
-        for (Entity entity : location.toLocation(world).getChunk().getEntities()) {
+        for (Entity entity : location.toLocation(world).getWorld().getEntities()) {
             double reach = entity.getLocation().toVector().distance(location.toVector()) - 0.3;
             if (reach < 5) {
                 if (entity instanceof Player) {
@@ -214,6 +213,10 @@ public class NPC extends Event {
         Nms.sendPacket(player,new PacketPlayOutAnimation(entity,0));
     }
 
+    public NPC getThis() {
+        return this;
+    }
+
     public void StartTicking() {
         core.getInstance().getSyncTaskScheduler().addRepeatingTask(new Runnable() {
             @Override
@@ -229,15 +232,17 @@ public class NPC extends Event {
 
                         double deltaYaw = Math.abs(npc.yaw - rot.getX());
                         if (deltaYaw < 10) {
-                            smoothRot++;
+                            //smoothRot++;
                         } else {
                             smoothRot = 0;
                         }
                         if (smoothRot < 5) {
                             location.setYaw((float) rot.getX());
                         }
+                        location.setPitch((float) rot.getZ());
 
                         updatePos();
+                        HandleEntity.check(location.toLocation(world),target,world,getThis());
                         ticks++;
 
                         reduce = false;
@@ -279,6 +284,11 @@ public class NPC extends Event {
             Nms.sendPacket(player,new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER,npc));
             Nms.sendPacket(player,new PacketPlayOutNamedEntitySpawn(npc));
             Nms.sendPacket(player,new PacketPlayOutEntityHeadRotation(npc,(byte) (npc.yaw * 256 / 360)));
+
+            DataWatcher watcher = npc.getDataWatcher();
+            watcher.watch(10, (byte) 127);
+            PacketPlayOutEntityMetadata packet = new PacketPlayOutEntityMetadata(npc.getId(), watcher, true);
+            Nms.sendPacket(player,packet);
         }
     }
 
@@ -287,38 +297,5 @@ public class NPC extends Event {
         Nms.sendPacket(player,new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER,npc));
         Nms.sendPacket(player,new PacketPlayOutNamedEntitySpawn(npc));
         Nms.sendPacket(player,new PacketPlayOutEntityHeadRotation(npc,(byte) (npc.yaw * 256 / 360)));
-    }
-
-    public Vector aimAsist(float currentYaw,float lastYaw,float pitch,float lastPitch,double speed) {
-        //This is a addon to a aimbot in order to make it undetectable.
-        /* Speed can be set from 1 to 100. */
-        float delta = currentYaw - lastYaw;
-        delta*= speed / 100;
-
-        float delta2 = pitch - lastPitch;
-        delta2*= speed / 100;
-
-        //Delta Patch
-        delta = fixNumber(delta);
-        delta2 = fixNumber(delta2);
-
-        float newYaw = lastYaw + delta;
-        float newPitch = lastPitch + delta2;
-
-        Vector outPut = new Vector(newYaw,newPitch,0);
-
-        return outPut;
-    }
-
-    public float fixNumber(float delta) {
-        delta+=WorldUtils.getRandom(-0.1,0.1);
-        if (Math.abs(delta) < 0.1) {
-            delta = (float) WorldUtils.getRandom(-0.5,0.5);
-            if (Math.abs(delta) < 0.1) {
-                return fixNumber(delta);
-            }
-        }
-
-        return delta;
     }
 }
