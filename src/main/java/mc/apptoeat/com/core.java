@@ -2,6 +2,7 @@ package mc.apptoeat.com;
 
 import lombok.Getter;
 import mc.apptoeat.com.utils.ai.NPC;
+import mc.apptoeat.com.utils.command.Command;
 import mc.apptoeat.com.utils.managers.*;
 import mc.apptoeat.com.utils.packets.PacketsListener;
 import mc.apptoeat.com.utils.shortcuts.SyncTaskScheduler;

@@ -26,7 +26,7 @@ public class VelocityManager {
     }
 
     public Vector getVelocity() {
-        return new Vector(x,y,z);
+        return new Vector(x, y, z);
     }
 
     public void tick() {
@@ -34,20 +34,10 @@ public class VelocityManager {
             y -= 0.08D;
             y *= 0.98F;
         }
-        if (x > 0) {
-            x *= 0.91F;
-        }
-        if (z > 0) {
-            z *= 0.91F;
-        }
-
-
-        if (y < 0.005) {
-            y = 0;
-        }
-        if (x < 0.005)
-            x = 0;
-        if (z < 0.005)
-            z = 0;
+        if (x > 0) x *= 0.91F;
+        if (z > 0) z *= 0.91F;
+        if (y < 0.005) y = 0;
+        if (x < 0.005) x = 0;
+        if (z < 0.005) z = 0;
     }
 }

@@ -41,9 +41,9 @@ public class WorldUtils {
         return true;
     }
 
-    public static boolean nearBlock(Location location,Material material,double xzOffset,double yOffSet) {
-        Location min = location.toVector().add(new Vector(xzOffset,1,xzOffset)).toLocation(location.getWorld());
-        Location max = location.toVector().subtract(new Vector(xzOffset,yOffSet,xzOffset)).toLocation(location.getWorld());
+    public static boolean nearBlock(Location location,Material material,double xzOffset,double yOffSet,double upYOffSet) {
+        Location min = location.toVector().subtract(new Vector(xzOffset,yOffSet,xzOffset)).toLocation(location.getWorld());
+        Location max = location.toVector().add(new Vector(xzOffset,upYOffSet,xzOffset)).toLocation(location.getWorld());
 
         for (Block block : blocksFromTwoPoints(min,max)) {
             if (block.getType() == material) {

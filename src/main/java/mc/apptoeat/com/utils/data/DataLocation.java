@@ -38,7 +38,7 @@ public class DataLocation {
     }
 
     public DataLocation clone() {
-        return new DataLocation(x,y,z,yaw,pitch,world,onGround);
+        return new DataLocation(x, y, z, yaw, pitch, world, onGround);
     }
 
     public void addVector(Vector vector) {
@@ -50,10 +50,12 @@ public class DataLocation {
     public Location toLocation(World world) {
         if (yaw == 1000) {
             return new Location(world, x, y, z);
-        } else return new Location(world,x,y,z,yaw,pitch);
+        } else {
+            return new Location(world,x,y,z,yaw,pitch);
+        }
     }
 
-    public DataLocation(double x,double y,double z,float yaw,float pitch) {
+    public DataLocation(double x, double y, double z, float yaw, float pitch) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -61,7 +63,7 @@ public class DataLocation {
         this.pitch = pitch;
     }
 
-    public DataLocation(double x,double y,double z,float yaw,float pitch,World world) {
+    public DataLocation(double x, double y, double z, float yaw, float pitch, World world) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -70,7 +72,7 @@ public class DataLocation {
         this.world = world;
     }
 
-    public DataLocation(double x,double y,double z,float yaw,float pitch,World world,boolean onGround) {
+    public DataLocation(double x, double y, double z, float yaw, float pitch, World world, boolean onGround) {
         this.x = x;
         this.y = y;
         this.z = z;

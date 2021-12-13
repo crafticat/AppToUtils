@@ -1,6 +1,9 @@
 package mc.apptoeat.com.utils.ai;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
 import lombok.Getter;
 import lombok.Setter;
 import mc.apptoeat.com.core;
@@ -16,11 +19,18 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -60,15 +70,27 @@ public class NPC extends Event {
     /* Conations: Modify Able reach + cps, Abide Minecraft movements: Friction and generally how Minecraft calculates works , Smooth kb, The bot is able to reduce like a real player depends on your cps*/
     /* What's specials about it: it fully abides the Minecraft calculations which a lot of npc plugins don't such as citizens. */
 
-    public NPC(Location loc, String name, World w,Player target,int attackTicks,double reach,boolean targeting,boolean strafing,NPCInventory inventory,double h,double v) {
+    public NPC(UUID uuid,Location loc, String name, World w, Player target, int attackTicks, double reach, boolean targeting, boolean strafing, NPCInventory inventory, double h, double v) throws IOException {
             MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
             WorldServer world = ((CraftWorld) w).getHandle();
-            UUID uuid = target.getUniqueId();
-            GameProfile profile = new GameProfile(uuid, Color.code("&b&lCatBoty"));
 
-
+        GameProfile profile = new GameProfile(UUID.randomUUID(), Color.code("&b&lAppToBot"));
 
             npc = new EntityPlayer(server, world, profile, new PlayerInteractManager(world));
+
+        URL url_0 = new URL("https://api.mojang.com/users/profiles/minecraft/" + name);
+        InputStreamReader reader_0 = new InputStreamReader(url_0.openStream());
+
+        String var1 = new JsonParser().parse(reader_0).getAsJsonObject().get("id").getAsString();
+
+        URL url_1 = new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + var1 + "?unsigned=false");
+        InputStreamReader reader_1 = new InputStreamReader(url_1.openStream());
+        JsonObject textureProperty = new JsonParser().parse(reader_1).getAsJsonObject().get("properties").getAsJsonArray().get(0).getAsJsonObject();
+        String texture = textureProperty.get("value").getAsString();
+        String signature = textureProperty.get("signature").getAsString();
+
+        npc.getProfile().getProperties().put("textures", new Property("textures", texture, signature));
+
             npc.setLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
             location = new DataLocation(loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
             oldLoc = location;
@@ -86,9 +108,7 @@ public class NPC extends Event {
             sendCreatesPackets();
 
             core.getInstance().getEventManager().getEvents().add(this);
-            if (targeting) {
-                StartTicking();
-            }
+            if (targeting) StartTicking();
             core.getInstance().getNpcManager().getNpcs().add(this);
 
             velocity = new Vector(0,0,0);
@@ -99,21 +119,11 @@ public class NPC extends Event {
 
 
     public void setItemsFromInv(NPCInventory inventory) {
-        if (inventory.getMainItem() != null) {
-            npc.getBukkitEntity().setItemInHand(inventory.getMainItem());
-        }
-        if (inventory.getHelmet() != null) {
-            npc.getBukkitEntity().getInventory().setHelmet(inventory.getHelmet());
-        }
-        if (inventory.getChestPlace() != null) {
-            npc.getBukkitEntity().getInventory().setChestplate(inventory.getChestPlace());
-        }
-        if (inventory.getLeggings() != null) {
-            npc.getBukkitEntity().getInventory().setLeggings(inventory.getLeggings());
-        }
-        if (inventory.getBoots() != null) {
-            npc.getBukkitEntity().getInventory().setBoots(inventory.getBoots());
-        }
+        if (inventory.getMainItem() != null) npc.getBukkitEntity().setItemInHand(inventory.getMainItem());
+        if (inventory.getHelmet() != null) npc.getBukkitEntity().getInventory().setHelmet(inventory.getHelmet());
+        if (inventory.getChestPlace() != null) npc.getBukkitEntity().getInventory().setChestplate(inventory.getChestPlace());
+        if (inventory.getLeggings() != null) npc.getBukkitEntity().getInventory().setLeggings(inventory.getLeggings());
+        if (inventory.getBoots() != null) npc.getBukkitEntity().getInventory().setBoots(inventory.getBoots());
     }
 
     public void setPath(Location loc) {
@@ -121,9 +131,7 @@ public class NPC extends Event {
     }
 
     public void removeNPCPacket() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            Nms.sendPacket(player,new PacketPlayOutEntityDestroy(npc.getId()));
-        }
+        for (Player player : Bukkit.getOnlinePlayers()) Nms.sendPacket(player,new PacketPlayOutEntityDestroy(npc.getId()));
     }
 
     public void updatePos() {
@@ -131,24 +139,28 @@ public class NPC extends Event {
 
         if (velocityTaken) {
             velocityTaken = false;
-        } else velocity = new Vector(0,0,0);
+        } else {
+            velocity = new Vector(0,0,0);
+        }
 
         float offSet = 0;
         if (nearEntitys() && strafing) {
             offSet = 45;
-            if (directionOfStrafe) offSet*=-1;
-
+            if (directionOfStrafe) offSet *= -1;
             sideTicks++;
+
             if (sideTicks > 60) {
                 directionOfStrafe = !directionOfStrafe;
                 sideTicks = 0;
             }
         }
 
-        Vector motion = PathFinder.newMotion(location.clone(),lastMot,0.1,world,npc.getId(),npc.onGround,velocity.clone(),offSet);
-        lastMotion = motion;
+        double reduce = 1;
+        if (this.reduce) reduce = 0.6;
 
-        Vector newXYZ = checkForBlocksInWay(location,world,motion);
+        Vector motion = PathFinder.newMotion(location.clone(), lastMot, 0.1, world, npc.getId(), npc.onGround, velocity.clone(), offSet,reduce);
+        lastMotion = motion;
+        Vector newXYZ = checkForBlocksInWay(location, world, motion);
         location.setX(newXYZ.getX());
         location.setY(newXYZ.getY());
         location.setZ(newXYZ.getZ());
@@ -158,6 +170,10 @@ public class NPC extends Event {
         }
     }
 
+    /**
+     * Checks if the npc is near an entity.
+     * @return boolean
+     */
     public boolean nearEntitys() {
         for (Entity entity : location.toLocation(world).getChunk().getEntities()) {
             double reach = entity.getLocation().toVector().distance(location.toVector()) - 0.3;
@@ -184,12 +200,12 @@ public class NPC extends Event {
     }
 
     public void checkForAttack() {
-        ArrayList<Player> players = new ArrayList<>();
+        /*ArrayList<Player> players = new ArrayList<>();
         for (Entity entity : location.toLocation(world).getChunk().getEntities()) {
             if (entity instanceof Player) {
                 players.add((Player) entity);
             }
-        }
+        }*/
 
         for (Entity entity : location.toLocation(world).getWorld().getEntities()) {
             double reach = entity.getLocation().toVector().distance(location.toVector()) - 0.3;
@@ -210,7 +226,7 @@ public class NPC extends Event {
     }
 
     public void attack(net.minecraft.server.v1_8_R3.Entity entity, Player player) {
-        Nms.sendPacket(player,new PacketPlayOutAnimation(entity,0));
+        Nms.sendPacket(player, new PacketPlayOutAnimation(entity,0));
     }
 
     public NPC getThis() {
@@ -232,13 +248,12 @@ public class NPC extends Event {
 
                         double deltaYaw = Math.abs(npc.yaw - rot.getX());
                         if (deltaYaw < 10) {
-                            //smoothRot++;
+                            smoothRot++;
                         } else {
                             smoothRot = 0;
                         }
-                        if (smoothRot < 5) {
-                            location.setYaw((float) rot.getX());
-                        }
+
+                        if (smoothRot < 5) location.setYaw((float) rot.getX());
                         location.setPitch((float) rot.getZ());
 
                         updatePos();
@@ -276,26 +291,26 @@ public class NPC extends Event {
         Vector targetVector = to.toVector();
         clonedFrom.setDirection(targetVector.subtract(startVector));
 
-        return new Vector(clonedFrom.getYaw(),0,clonedFrom.getPitch());
+        return new Vector(clonedFrom.getYaw(), 0, clonedFrom.getPitch());
     }
 
     private void sendCreatesPackets() {
         for (Player player : Bukkit.getOnlinePlayers()) {
-            Nms.sendPacket(player,new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER,npc));
-            Nms.sendPacket(player,new PacketPlayOutNamedEntitySpawn(npc));
-            Nms.sendPacket(player,new PacketPlayOutEntityHeadRotation(npc,(byte) (npc.yaw * 256 / 360)));
+            Nms.sendPacket(player, new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, npc));
+            Nms.sendPacket(player, new PacketPlayOutNamedEntitySpawn(npc));
+            Nms.sendPacket(player, new PacketPlayOutEntityHeadRotation(npc, (byte) (npc.yaw * 256 / 360)));
 
             DataWatcher watcher = npc.getDataWatcher();
             watcher.watch(10, (byte) 127);
             PacketPlayOutEntityMetadata packet = new PacketPlayOutEntityMetadata(npc.getId(), watcher, true);
-            Nms.sendPacket(player,packet);
+            Nms.sendPacket(player, packet);
         }
     }
 
     @Override
     public void joinEvent(Player player) {
-        Nms.sendPacket(player,new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER,npc));
-        Nms.sendPacket(player,new PacketPlayOutNamedEntitySpawn(npc));
-        Nms.sendPacket(player,new PacketPlayOutEntityHeadRotation(npc,(byte) (npc.yaw * 256 / 360)));
+        Nms.sendPacket(player, new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, npc));
+        Nms.sendPacket(player, new PacketPlayOutNamedEntitySpawn(npc));
+        Nms.sendPacket(player, new PacketPlayOutEntityHeadRotation(npc, (byte) (npc.yaw * 256 / 360)));
     }
 }

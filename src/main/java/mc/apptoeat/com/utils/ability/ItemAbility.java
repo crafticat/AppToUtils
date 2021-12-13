@@ -13,19 +13,17 @@ public class ItemAbility extends Event {
     @Getter
     protected ItemStack item;
     @Getter
-    private String name;
+    private final String name;
     @Getter
-    private String colorCodes;
-    private ItemMeta meta;
+    private final String colorCodes;
 
-    public ItemAbility(Material material, String name,String colorCodes) {
+    public ItemAbility(Material material, String name, String colorCodes) {
 
         ItemStack gun = new ItemStack(material);
         ItemMeta meta = gun.getItemMeta();
         meta.setDisplayName(Color.code(colorCodes) + name);
         gun.setItemMeta(meta);
 
-        this.meta = meta;
         this.item = gun;
         this.name = name;
         this.colorCodes = colorCodes;
@@ -35,14 +33,13 @@ public class ItemAbility extends Event {
 
     @Override
     public void rightClickEvent(Player player, ItemStack clickedItem) {
-        if (clickedItem.getItemMeta().equals(item.getItemMeta())) {
-            rightClick(player, clickedItem);
-        }
+        if (!clickedItem.getItemMeta().equals(item.getItemMeta())) return;
+        rightClick(player, clickedItem);
     }
 
     @Override
     public void joinEvent(Player player) {
-        player.getInventory().setItem(0,item);
+        player.getInventory().setItem(0, item);
     }
 
     public void rightClick(Player player, ItemStack clickedItem) {}
