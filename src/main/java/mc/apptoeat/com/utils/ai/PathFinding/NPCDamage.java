@@ -24,7 +24,7 @@ public class NPCDamage extends Event {
         for (NPC npc : core.getInstance().getNpcManager().getNpcs()) {
             if (npc.getNpc().getId() == id) {
                 Nms.sendPacket(player, new PacketPlayOutAnimation(npc.getNpc(), 5));
-                if (System.currentTimeMillis() - lastDamage.getOrDefault(id, 0L) > 475) {
+                if (System.currentTimeMillis() - lastDamage.getOrDefault(id, 0L) > npc.getHitDelay()) {
                     sendDamage(npc,player);
                     lastDamage.put(id, System.currentTimeMillis());
                 }
@@ -33,7 +33,11 @@ public class NPCDamage extends Event {
     }
 
     public void sendDamage(NPC npc, Player attacker) {
-        npc.setVelocity(getVelocityAtDirection(attacker.getLocation().getYaw(), attacker.getWorld(), attacker, npc.getLastYUpdate(), npc.isReduce(), npc.getHVelocity(), npc.getVVelocity(), true));
+        double diff = 0;
+        if (npc.getHitDelay() < 400) {
+            diff = npc.getLocation().getY() - attacker.getLocation().getY();
+        }
+        npc.setVelocity(getVelocityAtDirection(attacker.getLocation().getYaw(), attacker.getWorld(), attacker, npc.getLastYUpdate(), npc.isReduce(), npc.getHVelocity(), npc.getVVelocity(), true,diff));
         npc.setVelocityTaken(true);
         Nms.sendPacket(attacker, new PacketPlayOutAnimation(npc.getNpc(), 1));
         attacker.playSound(attacker.getLocation(), Sound.HURT_FLESH, 100, 1);
@@ -44,13 +48,17 @@ public class NPCDamage extends Event {
     }
 
     public static void sendDamage(NPC npc,Player attacker,float yaw) {
-        npc.setVelocity(getVelocityAtDirection(yaw, attacker.getWorld(), attacker, npc.getLastYUpdate(), npc.isReduce(), npc.getHVelocity(), npc.getVVelocity(), false));
+        double diff = 0;
+        if (npc.getHitDelay() < 400) {
+            diff = npc.getLocation().getY() - attacker.getLocation().getY();
+        }
+        npc.setVelocity(getVelocityAtDirection(yaw, attacker.getWorld(), attacker, npc.getLastYUpdate(), npc.isReduce(), npc.getHVelocity(), npc.getVVelocity(), false,diff));
         npc.setVelocityTaken(true);
         Nms.sendPacket(attacker,new PacketPlayOutAnimation(npc.getNpc(),1));
         attacker.playSound(attacker.getLocation(), Sound.HURT_FLESH, 100, 1);
     }
 
-    public static Vector getVelocityAtDirection(float yaw, World world, Player attacker, long yUpdate, boolean reduce, double h, double v, boolean checkForSprinting) {
+    public static Vector getVelocityAtDirection(float yaw, World world, Player attacker, long yUpdate, boolean reduce, double h, double v, boolean checkForSprinting,double yDiff) {
 
         double hVelocity;
         if (h == 0) {
@@ -84,6 +92,10 @@ public class NPCDamage extends Event {
         if (v == 0) {
             vertical = 0.31;
         } else vertical = v;
+
+        if (yDiff + vertical > 2.5) {
+            vertical = 2.5 - yDiff;
+        }
 
         Vector vector = new Location(world, 0, 0, 0, yaw,0).getDirection().normalize().multiply(hVelocity);
         return new Vector(vector.getX(), vertical, vector.getZ());

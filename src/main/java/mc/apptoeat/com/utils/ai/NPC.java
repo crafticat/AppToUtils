@@ -65,6 +65,7 @@ public class NPC extends Event {
     private Runnable moveEvent;
     private double hVelocity;
     private double vVelocity;
+    private long hitDelay = 475;
 
     /* This Ai Utiles are made for pvp bots */
     /* Conations: Modify Able reach + cps, Abide Minecraft movements: Friction and generally how Minecraft calculates works , Smooth kb, The bot is able to reduce like a real player depends on your cps*/

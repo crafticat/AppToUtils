@@ -36,23 +36,25 @@ public class Gui extends Event {
 
     @Override
     public void invClickEvent(Player player, InventoryClickEvent e) {
-        if (e.getClick().isLeftClick()) {
-            if (e.getInventory().getName().equals(gui.getName())) {
-                e.setCancelled(true);
-                String itemName = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName().replace("&b&l", ""));
-                getClicker = (Player) e.getWhoClicked();
-                if (itemAction.containsKey(itemName)) itemAction.get(itemName).run();
+        try {
+            if (e.getClick().isLeftClick()) {
+                if (e.getInventory().getName().equals(gui.getName())) {
+                    e.setCancelled(true);
+                    String itemName = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName().replace("&b&l", ""));
+                    getClicker = (Player) e.getWhoClicked();
+                    if (itemAction.containsKey(itemName)) itemAction.get(itemName).run();
+                }
             }
-        }
 
-        if (e.getClick().isRightClick()) {
-            if (e.getInventory().getName().equals(gui.getName())) {
-                String itemName = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName().replace("&b&l", ""));
-                e.setCancelled(true);
-                getClicker = (Player) e.getWhoClicked();
-                if (itemAction.containsKey(itemName)) rightClick.get(itemName).run();
+            if (e.getClick().isRightClick()) {
+                if (e.getInventory().getName().equals(gui.getName())) {
+                    String itemName = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName().replace("&b&l", ""));
+                    e.setCancelled(true);
+                    getClicker = (Player) e.getWhoClicked();
+                    if (itemAction.containsKey(itemName)) rightClick.get(itemName).run();
+                }
             }
-        }
+        } catch (Exception ignore) {}
     }
 
     public void openInventory(final HumanEntity ent) {

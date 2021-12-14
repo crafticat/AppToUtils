@@ -24,7 +24,7 @@ public class HandleEntity {
                 float yaw = target.getLocation().getYaw();
                 entity.remove();
 
-                if (System.currentTimeMillis() - NPCDamage.lastDamage.getOrDefault(npc.getNpc().getId(), 0L) > 475) {
+                if (System.currentTimeMillis() - NPCDamage.lastDamage.getOrDefault(npc.getNpc().getId(), 0L) > npc.getHitDelay()) {
                     NPCDamage.sendDamage(npc, target, yaw);
                     NPCDamage.lastDamage.put(npc.getNpc().getId(), System.currentTimeMillis());
                 }
