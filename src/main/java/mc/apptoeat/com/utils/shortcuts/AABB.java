@@ -1,8 +1,5 @@
 package mc.apptoeat.com.utils.shortcuts;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Effect;
-import org.bukkit.World;
 import org.bukkit.util.Vector;
 
 public class AABB implements Cloneable {

@@ -59,42 +59,36 @@ public class NPCDamage extends Event {
     }
 
     public static Vector getVelocityAtDirection(float yaw, World world, Player attacker, long yUpdate, boolean reduce, double h, double v, boolean checkForSprinting,double yDiff) {
-
+        double vertical;
         double hVelocity;
+
+        if (v == 0) {
+            vertical = 0.31;
+        } else vertical = v;
+
         if (h == 0) {
             hVelocity = 0.428;
         } else {
             hVelocity = h;
         }
 
-        if (System.currentTimeMillis() - yUpdate > 200) {
+        if (yDiff + vertical > 2.5) {
+            vertical = 2.5 - yDiff;
+            hVelocity = 0.075;
+        }
+
+        if (System.currentTimeMillis() - yUpdate > 200 && yDiff == 0) {
             hVelocity *= 1.1;
         }
 
         if (attacker.isSprinting() && checkForSprinting) {
-            /* ATG */
-            //hVelocity *= 1.2;
-
-            /*  Mmc  */
-            //Nothing
-
-            /* Lunar */
-            //hVelocity *= 1.2;
-
-            //Lunar V2
             hVelocity *= 1.0;
+            if (yDiff != 0) {
+                hVelocity *= 1.2;
+            }
         }
         if (reduce) {
             hVelocity *= 0.6;
-        }
-
-        double vertical;
-        if (v == 0) {
-            vertical = 0.31;
-        } else vertical = v;
-
-        if (yDiff + vertical > 2.5) {
-            vertical = 2.5 - yDiff;
         }
 
         Vector vector = new Location(world, 0, 0, 0, yaw,0).getDirection().normalize().multiply(hVelocity);

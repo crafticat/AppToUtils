@@ -3,6 +3,7 @@ package mc.apptoeat.com.utils.gui;
 import lombok.Getter;
 import mc.apptoeat.com.core;
 import mc.apptoeat.com.utils.events.Event;
+import mc.apptoeat.com.utils.objects.PlayerRunnable;
 import mc.apptoeat.com.utils.shortcuts.Color;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,8 +23,8 @@ import java.util.List;
 @Getter
 public class Gui extends Event {
     private final Inventory gui;
-    private final HashMap<String,Runnable> itemAction = new HashMap<>();
-    private final HashMap<String,Runnable> rightClick = new HashMap<>();
+    private final HashMap<String, PlayerRunnable> itemAction = new HashMap<>();
+    private final HashMap<String,PlayerRunnable> rightClick = new HashMap<>();
     private int size;
     private Player getClicker;
 
@@ -41,8 +42,7 @@ public class Gui extends Event {
                 if (e.getInventory().getName().equals(gui.getName())) {
                     e.setCancelled(true);
                     String itemName = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName().replace("&b&l", ""));
-                    getClicker = (Player) e.getWhoClicked();
-                    if (itemAction.containsKey(itemName)) itemAction.get(itemName).run();
+                    if (itemAction.containsKey(itemName)) itemAction.get(itemName).run(player);
                 }
             }
 
@@ -50,8 +50,7 @@ public class Gui extends Event {
                 if (e.getInventory().getName().equals(gui.getName())) {
                     String itemName = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName().replace("&b&l", ""));
                     e.setCancelled(true);
-                    getClicker = (Player) e.getWhoClicked();
-                    if (itemAction.containsKey(itemName)) rightClick.get(itemName).run();
+                    if (itemAction.containsKey(itemName)) rightClick.get(itemName).run(player);
                 }
             }
         } catch (Exception ignore) {}
@@ -61,11 +60,11 @@ public class Gui extends Event {
         ent.openInventory(gui);
     }
 
-    public void setRightClick(Runnable runnable,String name) {
+    public void setRightClick(PlayerRunnable runnable,String name) {
         rightClick.put(name,runnable);
     }
 
-    public void createGuiItem(final Material material, int slot, final String name,String color, Runnable action, final String... lore) {
+    public void createGuiItem(final Material material, int slot, final String name,String color, PlayerRunnable action, final String... lore) {
         final ItemStack item = new ItemStack(material, 1);
         final ItemMeta meta = item.getItemMeta();
         itemAction.put(name,action);
@@ -86,7 +85,7 @@ public class Gui extends Event {
         gui.setItem(slot,item);
     }
 
-    public void createGuiItem(final Material material,int amount,Byte id, int slot, final String name,String color, Runnable action, final String... lore) {
+    public void createGuiItem(final Material material,int amount,Byte id, int slot, final String name,String color, PlayerRunnable action, final String... lore) {
         final ItemStack item = new ItemStack(material, amount,id);
         final ItemMeta meta = item.getItemMeta();
         itemAction.put(name,action);
