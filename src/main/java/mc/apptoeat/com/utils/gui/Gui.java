@@ -26,7 +26,6 @@ public class Gui extends Event {
     private final HashMap<String, PlayerRunnable> itemAction = new HashMap<>();
     private final HashMap<String,PlayerRunnable> rightClick = new HashMap<>();
     private int size;
-    private Player getClicker;
 
     public Gui(String title,int size) {
         gui = Bukkit.createInventory(null, size, Color.code(title));
@@ -40,20 +39,22 @@ public class Gui extends Event {
         try {
             if (e.getClick().isLeftClick()) {
                 if (e.getInventory().getName().equals(gui.getName())) {
-                    e.setCancelled(true);
                     String itemName = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName().replace("&b&l", ""));
                     if (itemAction.containsKey(itemName)) itemAction.get(itemName).run(player);
                 }
             }
 
+            if (e.getInventory().getName().equals(gui.getName())) e.setCancelled(true);
+
             if (e.getClick().isRightClick()) {
                 if (e.getInventory().getName().equals(gui.getName())) {
                     String itemName = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName().replace("&b&l", ""));
-                    e.setCancelled(true);
                     if (itemAction.containsKey(itemName)) rightClick.get(itemName).run(player);
                 }
             }
-        } catch (Exception ignore) {}
+        } catch (Exception xp) {
+            xp.printStackTrace();
+        }
     }
 
     public void openInventory(final HumanEntity ent) {

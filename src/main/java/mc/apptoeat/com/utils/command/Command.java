@@ -3,6 +3,7 @@ package mc.apptoeat.com.utils.command;
 import lombok.Getter;
 import lombok.Setter;
 import mc.apptoeat.com.core;
+import mc.apptoeat.com.utils.objects.PlayerRunnable;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
@@ -14,12 +15,12 @@ import java.util.ArrayList;
 @Setter
 public class Command extends BukkitCommand {
 
-    private Runnable onCommand;
+    private PlayerRunnable onCommand;
     private String arg;
     private String[] args;
     private Player player;
 
-    public Command(String name, String description, String usageMessage, Runnable command) {
+    public Command(String name, String description, String usageMessage, PlayerRunnable command) {
         super(name);
         this.description = description;
         this.usageMessage = usageMessage;
@@ -35,7 +36,7 @@ public class Command extends BukkitCommand {
             this.arg = commandLabel;
             this.args = args;
             this.player = player;
-            onCommand.run();
+            onCommand.run(player);
         }
         return false;
     }
