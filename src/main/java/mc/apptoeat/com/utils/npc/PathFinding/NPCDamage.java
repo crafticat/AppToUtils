@@ -1,7 +1,7 @@
-package mc.apptoeat.com.utils.ai.PathFinding;
+package mc.apptoeat.com.utils.npc.PathFinding;
 
 import mc.apptoeat.com.core;
-import mc.apptoeat.com.utils.ai.NPC;
+import mc.apptoeat.com.utils.npc.NPC;
 import mc.apptoeat.com.utils.events.Event;
 import mc.apptoeat.com.utils.shortcuts.Nms;
 import net.minecraft.server.v1_8_R3.PacketPlayOutAnimation;

@@ -1,6 +1,6 @@
-package mc.apptoeat.com.utils.ai.PathFinding;
+package mc.apptoeat.com.utils.npc.PathFinding;
 
-import mc.apptoeat.com.utils.ai.NPC;
+import mc.apptoeat.com.utils.npc.NPC;
 import mc.apptoeat.com.utils.shortcuts.AABB;
 import mc.apptoeat.com.utils.shortcuts.EntityUtils;
 import org.bukkit.Location;

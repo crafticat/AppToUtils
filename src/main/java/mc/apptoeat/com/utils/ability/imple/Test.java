@@ -1,14 +1,7 @@
 package mc.apptoeat.com.utils.ability.imple;
 
-import mc.apptoeat.com.core;
 import mc.apptoeat.com.utils.ability.ItemAbility;
-import mc.apptoeat.com.utils.ai.NPC;
-import mc.apptoeat.com.utils.ai.PathFinding.NPCInventory;
-import mc.apptoeat.com.utils.data.DataPlayer;
-import mc.apptoeat.com.utils.gui.Gui;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 public class Test extends ItemAbility {
     public Test() {

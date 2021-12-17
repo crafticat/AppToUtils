@@ -16,20 +16,24 @@ public class DoubleFile {
         this.main = mainClass;
 
         mainClass.getConfig().set(path,num);
+        main.saveConfig();
     }
 
     public void add(double var1) {
         num += var1;
         main.getConfig().set(path,num);
+        main.saveConfig();
     }
 
     public void subtract(double var1) {
         num -= var1;
         main.getConfig().set(path,num);
+        main.saveConfig();
     }
 
     public void set(double var1) {
         num = var1;
         main.getConfig().set(path,num);
+        main.saveConfig();
     }
 }

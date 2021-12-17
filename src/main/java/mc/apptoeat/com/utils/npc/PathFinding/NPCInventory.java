@@ -1,8 +1,7 @@
-package mc.apptoeat.com.utils.ai.PathFinding;
+package mc.apptoeat.com.utils.npc.PathFinding;
 
 import lombok.Getter;
 import lombok.Setter;
-import mc.apptoeat.com.utils.ai.NPC;
 import org.bukkit.inventory.ItemStack;
 
 @Getter

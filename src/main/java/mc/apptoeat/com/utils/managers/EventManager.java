@@ -2,7 +2,7 @@ package mc.apptoeat.com.utils.managers;
 
 import lombok.Getter;
 import lombok.Setter;
-import mc.apptoeat.com.utils.ai.PathFinding.NPCDamage;
+import mc.apptoeat.com.utils.npc.PathFinding.NPCDamage;
 import mc.apptoeat.com.utils.events.Event;
 
 import java.util.ArrayList;

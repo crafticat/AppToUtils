@@ -1,4 +1,4 @@
-package mc.apptoeat.com.utils.ai;
+package mc.apptoeat.com.utils.npc;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -7,9 +7,9 @@ import com.mojang.authlib.properties.Property;
 import lombok.Getter;
 import lombok.Setter;
 import mc.apptoeat.com.core;
-import mc.apptoeat.com.utils.ai.PathFinding.HandleEntity;
-import mc.apptoeat.com.utils.ai.PathFinding.NPCInventory;
-import mc.apptoeat.com.utils.ai.PathFinding.PathFinder;
+import mc.apptoeat.com.utils.npc.PathFinding.HandleEntity;
+import mc.apptoeat.com.utils.npc.PathFinding.NPCInventory;
+import mc.apptoeat.com.utils.npc.PathFinding.PathFinder;
 import mc.apptoeat.com.utils.data.DataLocation;
 import mc.apptoeat.com.utils.events.Event;
 import mc.apptoeat.com.utils.shortcuts.*;
@@ -19,19 +19,14 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.UUID;
 
 @Getter

@@ -1,4 +1,4 @@
-package mc.apptoeat.com.utils.ai.PathFinding;
+package mc.apptoeat.com.utils.npc.PathFinding;
 
 import mc.apptoeat.com.utils.data.DataLocation;
 import mc.apptoeat.com.utils.shortcuts.WorldUtils;

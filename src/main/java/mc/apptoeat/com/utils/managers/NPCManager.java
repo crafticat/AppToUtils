@@ -2,7 +2,7 @@ package mc.apptoeat.com.utils.managers;
 
 import lombok.Getter;
 import mc.apptoeat.com.core;
-import mc.apptoeat.com.utils.ai.NPC;
+import mc.apptoeat.com.utils.npc.NPC;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
