@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 public class MathUtils {
 
@@ -82,5 +83,30 @@ public class MathUtils {
 
 
         return (int) Math.round(damageValue);
+    }
+
+    public static boolean equalVectors(Vector vector, Vector vector2,double epsilon) {
+        return Math.abs(vector.getX() - vector2.getX()) < epsilon && Math.abs(vector.getY() - vector2.getY()) < epsilon && Math.abs(vector.getZ() - vector2.getZ()) < epsilon;
+    }
+
+    public static double floor(double number, double by, boolean down) {
+        double var1 = number / by;
+        if (down) {
+            var1 = Math.floor(var1);
+        } else var1  = Math.ceil(var1);
+        var1 *= by;
+
+        return var1;
+    }
+
+    public static double getRandom(double min,double max) {
+        min = min * 100;
+        max = max * 100;
+
+        for(int i = (int) min; i <=max; i++) {
+            double getRandomValue = ((int) (Math.random() * (max - min)) + min) / 100;
+            return getRandomValue;
+        }
+        return 0;
     }
 }

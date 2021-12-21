@@ -10,6 +10,8 @@ public class DataPlayer {
 
     public NPC npc;
 
+    public long guiCooldown;
+
     public DataPlayer(Player player) {
         this.player = player;
     }

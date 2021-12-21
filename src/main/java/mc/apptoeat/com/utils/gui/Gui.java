@@ -2,6 +2,7 @@ package mc.apptoeat.com.utils.gui;
 
 import lombok.Getter;
 import mc.apptoeat.com.core;
+import mc.apptoeat.com.utils.data.DataPlayer;
 import mc.apptoeat.com.utils.events.Event;
 import mc.apptoeat.com.utils.objects.PlayerRunnable;
 import mc.apptoeat.com.utils.shortcuts.Color;
@@ -39,8 +40,12 @@ public class Gui extends Event {
         try {
             if (e.getClick().isLeftClick()) {
                 if (e.getInventory().getName().equals(gui.getName())) {
-                    String itemName = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName().replace("&b&l", ""));
-                    if (itemAction.containsKey(itemName)) itemAction.get(itemName).run(player);
+                    DataPlayer data = core.getInstance().getDataManager().getDataPlayer(player);
+                    if (System.currentTimeMillis() - data.guiCooldown > 50 * 3) {
+                        data.guiCooldown = System.currentTimeMillis();
+                        String itemName = ChatColor.stripColor(e.getCurrentItem().getItemMeta().getDisplayName().replace("&b&l", ""));
+                        if (itemAction.containsKey(itemName)) itemAction.get(itemName).run(player);
+                    }
                 }
             }
 

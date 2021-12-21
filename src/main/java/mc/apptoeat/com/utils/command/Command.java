@@ -17,7 +17,6 @@ import java.util.HashMap;
 public class Command extends BukkitCommand {
 
     private PlayerRunnable onCommand;
-    private HashMap<String,PlayerRunnable> subCommands = new HashMap<>();
     private String arg;
     private String[] args;
     private Player player;
@@ -31,10 +30,6 @@ public class Command extends BukkitCommand {
         ((CraftServer) core.getInstance().getServer()).getCommandMap().register(name, this);
     }
 
-    public void addSubCommand(String subType,PlayerRunnable goBrr) {
-        subCommands.put(subType,goBrr);
-    }
-
     @Override
     public boolean execute(CommandSender sender, String commandLabel, String[] args) {
         if (sender instanceof Player) {
@@ -43,8 +38,6 @@ public class Command extends BukkitCommand {
             this.args = args;
             this.player = player;
             onCommand.run(player);
-
-            if (subCommands.containsKey(args[0])) subCommands.get(args[0]).run(player);
         }
         return false;
     }

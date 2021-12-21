@@ -37,10 +37,5 @@ public class ItemAbility extends Event {
         rightClick(player, clickedItem);
     }
 
-    @Override
-    public void joinEvent(Player player) {
-        player.getInventory().setItem(0, item);
-    }
-
     public void rightClick(Player player, ItemStack clickedItem) {}
 }
