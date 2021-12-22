@@ -70,7 +70,7 @@ public class NPC extends Event {
             MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
             WorldServer world = ((CraftWorld) w).getHandle();
 
-        GameProfile profile = new GameProfile(UUID.randomUUID(), Color.code("&b&lAppToBot"));
+        GameProfile profile = new GameProfile(UUID.randomUUID(), Color.code("&c&lAppToBot"));
 
             npc = new EntityPlayer(server, world, profile, new PlayerInteractManager(world));
 
