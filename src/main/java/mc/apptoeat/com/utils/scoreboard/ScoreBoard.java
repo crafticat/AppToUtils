@@ -19,11 +19,11 @@ public class ScoreBoard {
     private Scoreboard b;
     private Objective o;
 
-    public ScoreBoard(String title,final String... scoreboard) {
+    public ScoreBoard(String title,String name,final String... scoreboard) {
         m = Bukkit.getScoreboardManager();
         b = m.getNewScoreboard();
 
-        o = b.registerNewObjective(title, "");
+        o = b.registerNewObjective(name, "");
         o.setDisplaySlot(DisplaySlot.SIDEBAR);
         o.setDisplayName(Color.code(title));
 
