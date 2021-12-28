@@ -6,6 +6,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MathUtils {
 
     public static int getItemDamageValue(ItemStack is,ItemStack helmet1, ItemStack chestplate1,ItemStack leggings1,ItemStack boots1) {
@@ -108,5 +111,9 @@ public class MathUtils {
             return getRandomValue;
         }
         return 0;
+    }
+
+    public static Object getRandomObject(List<Object> list) {
+        return list.get((int) (getRandom(0, list.size()) - 1));
     }
 }

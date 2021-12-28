@@ -9,8 +9,8 @@ import org.bukkit.util.Vector;
 @Getter
 public class DoubleFile {
     private double num;
-    private String path;
-    private Plugin main;
+    private final String path;
+    private final Plugin main;
 
     public DoubleFile(Double def, String path, Plugin mainClass) {
         this.path = path;

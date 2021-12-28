@@ -24,8 +24,8 @@ import java.util.List;
 @Getter
 public class Gui extends Event {
     private final Inventory gui;
-    private final HashMap<String, PlayerRunnable> itemAction = new HashMap<>();
-    private final HashMap<String,PlayerRunnable> rightClick = new HashMap<>();
+    private HashMap<String, PlayerRunnable> itemAction = new HashMap<>();
+    private HashMap<String,PlayerRunnable> rightClick = new HashMap<>();
     private int size;
 
     public Gui(String title,int size) {
@@ -33,6 +33,12 @@ public class Gui extends Event {
         this.size = size;
 
         core.getInstance().getEventManager().getEvents().add(this);
+    }
+
+    public void reset() {
+        itemAction = new HashMap<>();
+        rightClick = new HashMap<>();
+        gui.clear();
     }
 
     @Override
