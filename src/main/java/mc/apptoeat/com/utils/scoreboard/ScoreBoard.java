@@ -65,7 +65,7 @@ public class ScoreBoard {
         for (String s : oldList) {
             t++;
             if (t == line) {
-                oldList.remove(s);
+                oldList.remove(var1);
                 oldList.set(var1,message);
             }
         }
