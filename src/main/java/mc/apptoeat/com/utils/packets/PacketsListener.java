@@ -72,7 +72,7 @@ public class PacketsListener implements Listener {
         ChannelPipeline pipeline = channel.pipeline();
         if (pipeline == null)
             return;
-        String handlerName = "atg_packet_processor";
+        String handlerName = "atg2_packet_processor";
         channel.eventLoop().submit(() -> {
             if(pipeline.get(handlerName) != null)
                 pipeline.remove(handlerName);
@@ -84,7 +84,7 @@ public class PacketsListener implements Listener {
     public void removePlayer(Player player) {
         Channel channel = ((CraftPlayer) player).getHandle().playerConnection.networkManager.channel;
         ChannelPipeline pipeline = channel.pipeline();
-        String handlerName = "hawk_packet_processor";
+        String handlerName = "atg2_packet_processor";
         channel.eventLoop().submit(() -> {
             if(pipeline.get(handlerName) != null)
                 pipeline.remove(handlerName);

@@ -51,8 +51,7 @@ public class ScoreBoard {
         player.setScoreboard(b);
     }
 
-    public void update(int line,String message,Player player) {
-        int var1 = line - 1;
+    public void update(Player player,final String... scoreboard) {
         m = Bukkit.getScoreboardManager();
         b = m.getNewScoreboard();
 
@@ -60,24 +59,15 @@ public class ScoreBoard {
         o.setDisplaySlot(DisplaySlot.SIDEBAR);
         o.setDisplayName(Color.code(title));
 
-        List<String> oldList = scoreBoard;
-        int t = 0;
-        for (String s : oldList) {
-            t++;
-            if (t == line) {
-                oldList.remove(var1);
-                oldList.set(var1,message);
-            }
-        }
-
-        List<String> strings = oldList;
+        List<String> strings = Arrays.asList(scoreboard);
         int i = 0;
         for (String s : strings) {
-            int var2 = strings.size() - i;
+            int var1 = strings.size() - i;
             i++;
             Score score = o.getScore(Color.code(s));
-            score.setScore(var2);
+            score.setScore(var1);
         }
+
 
         scoreBoard = strings;
 

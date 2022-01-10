@@ -19,6 +19,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -27,6 +28,7 @@ import org.bukkit.util.Vector;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.UUID;
 
 @Getter
@@ -61,6 +63,9 @@ public class NPC extends Event {
     private double hVelocity;
     private double vVelocity;
     private long hitDelay = 475;
+    private boolean wtap = false;
+
+    private ArrayList<Player> view = new ArrayList<>();
 
     /* This Ai Utiles are made for pvp bots */
     /* Conations: Modify Able reach + cps, Abide Minecraft movements: Friction and generally how Minecraft calculates works , Smooth kb, The bot is able to reduce like a real player depends on your cps*/
@@ -101,7 +106,7 @@ public class NPC extends Event {
             vVelocity = v;
 
             setItemsFromInv(inventory);
-            sendCreatesPackets();
+            sendCreatesPackets(target);
 
             core.getInstance().getEventManager().getEvents().add(this);
             if (targeting) StartTicking();
@@ -111,6 +116,11 @@ public class NPC extends Event {
             velocityTaken = false;
             this.attackTicks = attackTicks;
             this.reach = reach;
+    }
+
+    public void addViewAblePerson(Player player) {
+        sendCreatesPackets(player);
+        view.add(player);
     }
 
 
@@ -128,6 +138,8 @@ public class NPC extends Event {
 
     public void removeNPCPacket() {
         for (Player player : Bukkit.getOnlinePlayers()) Nms.sendPacket(player,new PacketPlayOutEntityDestroy(npc.getId()));
+        for (Player player : Bukkit.getOnlinePlayers()) Nms.sendPacket(player,new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, npc));
+        core.getInstance().getNpcManager().getNpcs().remove(this);
     }
 
     public void updatePos() {
@@ -173,7 +185,7 @@ public class NPC extends Event {
     public boolean nearEntitys() {
         for (Entity entity : location.toLocation(world).getChunk().getEntities()) {
             double reach = entity.getLocation().toVector().distance(location.toVector()) - 0.3;
-            if (reach < 4) {
+            if (reach < 6) {
                 if (entity instanceof Player) {
                     return true;
                 }
@@ -186,10 +198,18 @@ public class NPC extends Event {
     public static Vector checkForBlocksInWay(DataLocation from,World world,Vector motion) {
         Location checkForBlocks = from.toLocation(world).toVector().add(motion).toLocation(world);
         boolean locIsBlock = checkForBlocks.getBlock().getType() != org.bukkit.Material.AIR;
+
+        Location oldLoc = from.toLocation(world);
         Vector location = from.toLocation(world).toVector().add(motion);
-        if (locIsBlock) {
-            double requireYtoBeOnGround = checkForBlocks.getBlock().getY() + 1;
+
+        double requireYtoBeOnGround = checkForBlocks.getBlock().getY() + 1;
+
+        Location checkForBlocksV2 = from.toLocation(world).toVector().add(motion).setY(requireYtoBeOnGround).toLocation(world);
+        boolean locIsBlockV2 = checkForBlocksV2.getBlock().getType() != org.bukkit.Material.AIR;
+        if (locIsBlock && !locIsBlockV2) {
             location.setY(requireYtoBeOnGround);
+        } else {
+            if (locIsBlock) location = oldLoc.toVector().add(motion.setX(0).setZ(0));
         }
 
         return location;
@@ -215,6 +235,12 @@ public class NPC extends Event {
                     Player player = (Player) entity;
                     double damage = MathUtils.getItemDamageValue(inv.getMainItem(), player.getInventory().getHelmet(), player.getInventory().getChestplate(),player.getInventory().getLeggings(),player.getInventory().getBoots());
                     ((Damageable) entity).damage(damage, npc.getBukkitEntity());
+
+                    if (wtap) {
+                        Vector velocity = entity.getVelocity().clone().multiply(1.2).setY(entity.getVelocity().getY());
+                        entity.setVelocity(velocity);
+                    }
+
                     reduce = true;
                 }
             }
@@ -223,6 +249,9 @@ public class NPC extends Event {
 
     public void attack(net.minecraft.server.v1_8_R3.Entity entity, Player player) {
         Nms.sendPacket(player, new PacketPlayOutAnimation(entity,0));
+        for (Player var1 : view) {
+            Nms.sendPacket(var1, new PacketPlayOutAnimation(entity,0));
+        }
     }
 
     public NPC getThis() {
@@ -261,11 +290,17 @@ public class NPC extends Event {
                         if (npc.locY != location.getY()) lastYUpdate = System.currentTimeMillis();
 
                         npc.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
-                        for (Player player : Bukkit.getOnlinePlayers()) {
-                            Nms.sendPacket(player, new PacketPlayOutEntityTeleport(npc));
-                            Nms.sendPacket(player, new PacketPlayOutEntityHeadRotation(npc, (byte) (npc.yaw * 256 / 360)));
-                            oldLoc = location;
+
+                        Nms.sendPacket(target, new PacketPlayOutEntityTeleport(npc));
+                        Nms.sendPacket(target, new PacketPlayOutEntityHeadRotation(npc, (byte) (npc.yaw * 256 / 360)));
+
+                        for (Player var1 : view) {
+                            Nms.sendPacket(var1, new PacketPlayOutEntityTeleport(npc));
+                            Nms.sendPacket(var1, new PacketPlayOutEntityHeadRotation(npc, (byte) (npc.yaw * 256 / 360)));
                         }
+
+                        oldLoc = location;
+
                         if (ticks >= attackTicks) {
                             ticks = 0;
                             checkForAttack();
@@ -290,23 +325,14 @@ public class NPC extends Event {
         return new Vector(clonedFrom.getYaw(), 0, clonedFrom.getPitch());
     }
 
-    private void sendCreatesPackets() {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            Nms.sendPacket(player, new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, npc));
-            Nms.sendPacket(player, new PacketPlayOutNamedEntitySpawn(npc));
-            Nms.sendPacket(player, new PacketPlayOutEntityHeadRotation(npc, (byte) (npc.yaw * 256 / 360)));
-
-            DataWatcher watcher = npc.getDataWatcher();
-            watcher.watch(10, (byte) 127);
-            PacketPlayOutEntityMetadata packet = new PacketPlayOutEntityMetadata(npc.getId(), watcher, true);
-            Nms.sendPacket(player, packet);
-        }
-    }
-
-    @Override
-    public void joinEvent(Player player) {
+    private void sendCreatesPackets(Player player) {
         Nms.sendPacket(player, new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, npc));
         Nms.sendPacket(player, new PacketPlayOutNamedEntitySpawn(npc));
         Nms.sendPacket(player, new PacketPlayOutEntityHeadRotation(npc, (byte) (npc.yaw * 256 / 360)));
+
+        DataWatcher watcher = npc.getDataWatcher();
+        watcher.watch(10, (byte) 127);
+        PacketPlayOutEntityMetadata packet = new PacketPlayOutEntityMetadata(npc.getId(), watcher, true);
+        Nms.sendPacket(player, packet);
     }
 }
