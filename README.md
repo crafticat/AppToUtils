@@ -1,2 +1,2 @@
-# AppToEatCore
-Utils for apptoeat network
+# AppToEatCore (Outdated)
+Made by me a while ago
